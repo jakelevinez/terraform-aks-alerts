@@ -114,32 +114,6 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "kubeapiserver" {
     }
   }
   rule {
-    alert = "KubeAPIDown"
-    annotations = {
-      "description" = "KubeAPI has disappeared from Prometheus target discovery."
-      "runbook_url" = "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubeapidown"
-      "summary"     = "Target disappeared from Prometheus target discovery."
-    }
-    enabled    = false
-    expression = <<-EOT
-                absent(up{job="kube-apiserver"} == 1)
-            EOT 
-    for        = "PT15M"
-    labels = {
-      "severity" = "critical"
-    }
-    severity = 3
-
-    action {
-      action_group_id = var.action_group_id
-    }
-
-    alert_resolution {
-      auto_resolved   = true
-      time_to_resolve = "PT10M"
-    }
-  }
-  rule {
     alert = "KubeAPITerminatedRequests"
     annotations = {
       "description" = "The kubernetes apiserver has terminated {{ $value | humanizePercentage }} of its incoming requests."
