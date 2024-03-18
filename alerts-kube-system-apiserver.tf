@@ -6,7 +6,9 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "kubeapiserver" {
   description         = "Kube System API Server Alerts"
   rule_group_enabled  = true
   interval            = "PT1M"
-  scopes              = []
+  scopes = [
+
+  ]
 
   rule {
     alert = "KubeClientCertificateExpiration"
@@ -42,7 +44,7 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "kubeapiserver" {
       "runbook_url" = "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubeclientcertificateexpiration"
       "summary"     = "Client certificate is about to expire."
     }
-    enabled    = false
+    enabled    = true
     expression = <<-EOT
                 apiserver_client_certificate_expiration_seconds_count{job="kube-apiserver"} > 0 and on(job) histogram_quantile(0.01, sum by (job, le) (rate(apiserver_client_certificate_expiration_seconds_bucket{job="kube-apiserver"}[5m]))) < 86400
             EOT 
@@ -68,7 +70,7 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "kubeapiserver" {
       "runbook_url" = "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubeaggregatedapierrors"
       "summary"     = "Kubernetes aggregated API has reported errors."
     }
-    enabled    = false
+    enabled    = true
     expression = <<-EOT
                 sum by(name, namespace, cluster)(increase(aggregator_unavailable_apiservice_total{job="kube-apiserver"}[10m])) > 4
             EOT 
@@ -94,7 +96,7 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "kubeapiserver" {
       "runbook_url" = "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubeaggregatedapidown"
       "summary"     = "Kubernetes aggregated API is down."
     }
-    enabled    = false
+    enabled    = true
     expression = <<-EOT
                 (1 - max by(name, namespace, cluster)(avg_over_time(aggregator_unavailable_apiservice{job="kube-apiserver"}[10m]))) * 100 < 85
             EOT 
@@ -120,7 +122,7 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "kubeapiserver" {
       "runbook_url" = "https://github.com/kubernetes-monitoring/kubernetes-mixin/tree/master/runbook.md#alert-name-kubeapiterminatedrequests"
       "summary"     = "The kubernetes apiserver has terminated {{ $value | humanizePercentage }} of its incoming requests."
     }
-    enabled    = false
+    enabled    = true
     expression = <<-EOT
                 sum(rate(apiserver_request_terminations_total{job="kube-apiserver"}[10m]))  / (  sum(rate(apiserver_request_total{job="kube-apiserver"}[10m])) + sum(rate(apiserver_request_terminations_total{job="kube-apiserver"}[10m])) ) > 0.20
             EOT 

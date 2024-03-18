@@ -6,7 +6,9 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "kubeapiserverslo" {
   description         = "The API server is burning too much error budget."
   rule_group_enabled  = true
   interval            = "PT1M"
-  scopes              = []
+  scopes = [
+
+  ]
 
   rule {
     alert = "KubeAPIErrorBudgetBurn"

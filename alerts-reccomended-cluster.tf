@@ -1,4 +1,4 @@
-resource "azurerm_monitor_alert_prometheus_rule_group" "reccomendedAlerts" {
+resource "azurerm_monitor_alert_prometheus_rule_group" "reccomendedClusterAlerts" {
   name                = "KubernetesAlert-RecommendedMetricAlertsaccu-sandbox-aks-Cluster-level"
   resource_group_name = var.resource_group_name
   location            = var.location
@@ -6,7 +6,9 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "reccomendedAlerts" {
   description         = "Kubernetes Alert RuleGroup-RecommendedMetricAlerts - 0.1"
   rule_group_enabled  = true
   interval            = "PT1M"
-  scopes              = []
+  scopes = [
+
+  ]
 
   rule {
     alert = "KubeCPUQuotaOvercommit"
