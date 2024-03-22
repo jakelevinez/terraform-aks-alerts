@@ -6,9 +6,7 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "reccomendedNodeAlerts" {
   description         = "Kubernetes Alert RuleGroup-RecommendedMetricAlerts - 0.1"
   rule_group_enabled  = true
   interval            = "PT1M"
-  scopes = [
-
-  ]
+  scopes              = []
 
   rule {
     alert = "KubeNodeUnreachable"

@@ -5,9 +5,7 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "kuberesources" {
   cluster_name        = azurerm_kubernetes_cluster.cluster.name
   rule_group_enabled  = true
   interval            = "PT1M"
-  scopes = [
-
-  ]
+  scopes              = []
 
   rule {
     alert = "KubeCPUOvercommit"

@@ -6,9 +6,7 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "kubeapiserver" {
   description         = "Kube System API Server Alerts"
   rule_group_enabled  = true
   interval            = "PT1M"
-  scopes = [
-
-  ]
+  scopes              = []
 
   rule {
     alert = "KubeClientCertificateExpiration"

@@ -6,9 +6,7 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "reccomendedClusterAlerts
   description         = "Kubernetes Alert RuleGroup-RecommendedMetricAlerts - 0.1"
   rule_group_enabled  = true
   interval            = "PT1M"
-  scopes = [
-
-  ]
+  scopes              = []
 
   rule {
     alert = "KubeCPUQuotaOvercommit"
@@ -46,7 +44,7 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "reccomendedClusterAlerts
     severity = 3
 
     action {
-      action_group_id = "/subscriptions/602d3ad2-0ba2-4972-9d88-f87ca5b67ab2/resourceGroups/rg-pd-alerts/providers/Microsoft.Insights/actionGroups/aks-nprod-action-group"
+      action_group_id = var.action_group_id
     }
 
     alert_resolution {
@@ -54,30 +52,6 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "reccomendedClusterAlerts
       time_to_resolve = "PT10M"
     }
   }
-
-  rule {
-    alert = "KubeVersionMismatch"
-    annotations = {
-      "description" = "There are {{ $value }} different versions of Kubernetes components running in {{ $labels.cluster}}. For more information on this alert, please refer to this [link](https://github.com/prometheus-operator/runbooks/blob/main/content/runbooks/kubernetes/KubeVersionMismatch.md)"
-    }
-    enabled    = true
-    expression = "count by (cluster) (count by (git_version, cluster) (label_replace(kubernetes_build_info{job!~\"kube-dns|coredns\"},\"git_version\",\"$1\",\"git_version\",\"(v[0-9]*.[0-9]*).*\"))) > 1"
-    for        = "PT15M"
-    labels = {
-      "severity" = "warning"
-    }
-    severity = 3
-
-    action {
-      action_group_id = "/subscriptions/602d3ad2-0ba2-4972-9d88-f87ca5b67ab2/resourceGroups/rg-pd-alerts/providers/Microsoft.Insights/actionGroups/aks-nprod-action-group"
-    }
-
-    alert_resolution {
-      auto_resolved   = true
-      time_to_resolve = "PT10M"
-    }
-  }
-
   rule {
     alert = "Number of OOM killed containers is greater than 0"
     annotations = {
@@ -92,7 +66,7 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "reccomendedClusterAlerts
     severity = 4
 
     action {
-      action_group_id = "/subscriptions/602d3ad2-0ba2-4972-9d88-f87ca5b67ab2/resourceGroups/rg-pd-alerts/providers/Microsoft.Insights/actionGroups/aks-nprod-action-group"
+      action_group_id = var.action_group_id
     }
 
     alert_resolution {
@@ -115,7 +89,7 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "reccomendedClusterAlerts
     severity = 3
 
     action {
-      action_group_id = "/subscriptions/602d3ad2-0ba2-4972-9d88-f87ca5b67ab2/resourceGroups/rg-pd-alerts/providers/Microsoft.Insights/actionGroups/aks-nprod-action-group"
+      action_group_id = var.action_group_id
     }
 
     alert_resolution {
@@ -138,7 +112,7 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "reccomendedClusterAlerts
     severity = 4
 
     action {
-      action_group_id = "/subscriptions/602d3ad2-0ba2-4972-9d88-f87ca5b67ab2/resourceGroups/rg-pd-alerts/providers/Microsoft.Insights/actionGroups/aks-nprod-action-group"
+      action_group_id = var.action_group_id
     }
 
     alert_resolution {
@@ -161,7 +135,7 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "reccomendedClusterAlerts
     severity = 4
 
     action {
-      action_group_id = "/subscriptions/602d3ad2-0ba2-4972-9d88-f87ca5b67ab2/resourceGroups/rg-pd-alerts/providers/Microsoft.Insights/actionGroups/aks-nprod-action-group"
+      action_group_id = var.action_group_id
     }
 
     alert_resolution {
@@ -184,7 +158,7 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "reccomendedClusterAlerts
     severity = 4
 
     action {
-      action_group_id = "/subscriptions/602d3ad2-0ba2-4972-9d88-f87ca5b67ab2/resourceGroups/rg-pd-alerts/providers/Microsoft.Insights/actionGroups/aks-nprod-action-group"
+      action_group_id = var.action_group_id
     }
 
     alert_resolution {
@@ -207,7 +181,7 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "reccomendedClusterAlerts
     severity = 3
 
     action {
-      action_group_id = "/subscriptions/602d3ad2-0ba2-4972-9d88-f87ca5b67ab2/resourceGroups/rg-pd-alerts/providers/Microsoft.Insights/actionGroups/aks-nprod-action-group"
+      action_group_id = var.action_group_id
     }
 
     alert_resolution {
@@ -230,7 +204,7 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "reccomendedClusterAlerts
     severity = 3
 
     action {
-      action_group_id = "/subscriptions/602d3ad2-0ba2-4972-9d88-f87ca5b67ab2/resourceGroups/rg-pd-alerts/providers/Microsoft.Insights/actionGroups/aks-nprod-action-group"
+      action_group_id = var.action_group_id
     }
 
     alert_resolution {
@@ -253,7 +227,7 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "reccomendedClusterAlerts
     severity = 3
 
     action {
-      action_group_id = "/subscriptions/602d3ad2-0ba2-4972-9d88-f87ca5b67ab2/resourceGroups/rg-pd-alerts/providers/Microsoft.Insights/actionGroups/aks-nprod-action-group"
+      action_group_id = var.action_group_id
     }
 
     alert_resolution {
@@ -276,7 +250,7 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "reccomendedClusterAlerts
     severity = 4
 
     action {
-      action_group_id = "/subscriptions/602d3ad2-0ba2-4972-9d88-f87ca5b67ab2/resourceGroups/rg-pd-alerts/providers/Microsoft.Insights/actionGroups/aks-nprod-action-group"
+      action_group_id = var.action_group_id
     }
 
     alert_resolution {
@@ -299,7 +273,7 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "reccomendedClusterAlerts
     severity = 4
 
     action {
-      action_group_id = "/subscriptions/602d3ad2-0ba2-4972-9d88-f87ca5b67ab2/resourceGroups/rg-pd-alerts/providers/Microsoft.Insights/actionGroups/aks-nprod-action-group"
+      action_group_id = var.action_group_id
     }
 
     alert_resolution {
@@ -322,7 +296,7 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "reccomendedClusterAlerts
     severity = 4
 
     action {
-      action_group_id = "/subscriptions/602d3ad2-0ba2-4972-9d88-f87ca5b67ab2/resourceGroups/rg-pd-alerts/providers/Microsoft.Insights/actionGroups/aks-nprod-action-group"
+      action_group_id = var.action_group_id
     }
 
     alert_resolution {
@@ -345,7 +319,7 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "reccomendedClusterAlerts
     severity = 4
 
     action {
-      action_group_id = "/subscriptions/602d3ad2-0ba2-4972-9d88-f87ca5b67ab2/resourceGroups/rg-pd-alerts/providers/Microsoft.Insights/actionGroups/aks-nprod-action-group"
+      action_group_id = var.action_group_id
     }
 
     alert_resolution {
@@ -368,7 +342,7 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "reccomendedClusterAlerts
     severity = 3
 
     action {
-      action_group_id = "/subscriptions/602d3ad2-0ba2-4972-9d88-f87ca5b67ab2/resourceGroups/rg-pd-alerts/providers/Microsoft.Insights/actionGroups/aks-nprod-action-group"
+      action_group_id = var.action_group_id
     }
 
     alert_resolution {
@@ -391,7 +365,7 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "reccomendedClusterAlerts
     severity = 4
 
     action {
-      action_group_id = "/subscriptions/602d3ad2-0ba2-4972-9d88-f87ca5b67ab2/resourceGroups/rg-pd-alerts/providers/Microsoft.Insights/actionGroups/aks-nprod-action-group"
+      action_group_id = var.action_group_id
     }
 
     alert_resolution {
@@ -414,7 +388,7 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "reccomendedClusterAlerts
     severity = 4
 
     action {
-      action_group_id = "/subscriptions/602d3ad2-0ba2-4972-9d88-f87ca5b67ab2/resourceGroups/rg-pd-alerts/providers/Microsoft.Insights/actionGroups/aks-nprod-action-group"
+      action_group_id = var.action_group_id
     }
 
     alert_resolution {

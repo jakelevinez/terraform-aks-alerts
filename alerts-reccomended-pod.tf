@@ -6,9 +6,7 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "reccomendedPodAlerts" {
   description         = "Kubernetes Alert RuleGroup-RecommendedMetricAlerts - 0.1"
   rule_group_enabled  = true
   interval            = "PT1M"
-  scopes = [
-
-  ]
+  scopes              = []
 
   rule {
     alert = "KubePodCrashLooping"
@@ -55,12 +53,12 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "reccomendedPodAlerts" {
     }
   }
   rule {
-    alert = "Pod container restarted in the last 1 hour"
+    alert = "Pod container restarted more than 10 times in the last 1 hour"
     annotations = {
-      "description" = "Pod container restarted in the last 1 hour"
+      "description" = "Pod container restarted more than 10 times in the last 1 hour"
     }
     enabled    = true
-    expression = "sum by (namespace, controller, container, cluster)(increase(kube_pod_container_status_restarts_total{job=\"kube-state-metrics\"}[1h])* on(namespace, pod, cluster) group_left(controller) label_replace(kube_pod_owner, \"controller\", \"$1\", \"owner_name\", \"(.*)\")) > 0"
+    expression = "sum by (namespace, controller, container, cluster)(increase(kube_pod_container_status_restarts_total{job=\"kube-state-metrics\"}[1h])* on(namespace, pod, cluster) group_left(controller) label_replace(kube_pod_owner, \"controller\", \"$1\", \"owner_name\", \"(.*)\")) > 10"
     for        = "PT15M"
     labels = {
       "severity" = "warning"
@@ -127,28 +125,6 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "reccomendedPodAlerts" {
     }
     enabled    = true
     expression = "sum by (namespace, controller, cluster) (max by(namespace, pod, cluster) (kube_pod_status_phase{job=\"kube-state-metrics\", phase=~\"Pending|Unknown\"}  ) * on(namespace, pod, cluster) group_left(controller)label_replace(kube_pod_owner,\"controller\",\"$1\",\"owner_name\",\"(.*)\")) > 0"
-    for        = "PT15M"
-    labels = {
-      "severity" = "warning"
-    }
-    severity = 3
-
-    action {
-      action_group_id = var.action_group_id
-    }
-
-    alert_resolution {
-      auto_resolved   = true
-      time_to_resolve = "PT10M"
-    }
-  }
-  rule {
-    alert = "KubeStatefulSetGenerationMismatch"
-    annotations = {
-      "description" = "StatefulSet generation for {{ $labels.namespace }}/{{ $labels.statefulset }} does not match, this indicates that the StatefulSet has failed but has not been rolled back. For more information on this alert, please refer to this [link](https://github.com/prometheus-operator/runbooks/blob/main/content/runbooks/kubernetes/KubeStatefulSetGenerationMismatch.md)."
-    }
-    enabled    = true
-    expression = "kube_statefulset_status_observed_generation{job=\"kube-state-metrics\"} != kube_statefulset_metadata_generation{job=\"kube-state-metrics\"}"
     for        = "PT15M"
     labels = {
       "severity" = "warning"
@@ -296,93 +272,4 @@ resource "azurerm_monitor_alert_prometheus_rule_group" "reccomendedPodAlerts" {
       time_to_resolve = "PT10M"
     }
   }
-  rule {
-    alert = "KubeDeploymentReplicasMismatch"
-    annotations = {
-      "description" = "Deployment {{ $labels.namespace }}/{{ $labels.deployment }} in {{ $labels.cluster}} replica mismatch. For more information on this alert, please refer to this [link](https://github.com/prometheus-operator/runbooks/blob/main/content/runbooks/kubernetes/KubeDeploymentReplicasMismatch.md)"
-    }
-    enabled    = true
-    expression = "(  kube_deployment_spec_replicas{job=\"kube-state-metrics\"}    >  kube_deployment_status_replicas_available{job=\"kube-state-metrics\"}) and (  changes(kube_deployment_status_replicas_updated{job=\"kube-state-metrics\"}[10m])    ==  0)"
-    for        = "PT15M"
-    labels = {
-      "severity" = "warning"
-    }
-    severity = 4
-
-    action {
-      action_group_id = var.action_group_id
-    }
-
-    alert_resolution {
-      auto_resolved   = true
-      time_to_resolve = "PT15M"
-    }
-  }
-  rule {
-    alert = "KubeStatefulSetReplicasMismatch"
-    annotations = {
-      "description" = "StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} in {{ $labels.cluster}} replica mismatch. For more information on this alert, please refer to this [link](https://github.com/prometheus-operator/runbooks/blob/main/content/runbooks/kubernetes/KubeStatefulSetReplicasMismatch.md)"
-    }
-    enabled    = true
-    expression = "(  kube_statefulset_status_replicas_ready{job=\"kube-state-metrics\"}    !=  kube_statefulset_status_replicas{job=\"kube-state-metrics\"}) and (  changes(kube_statefulset_status_replicas_updated{job=\"kube-state-metrics\"}[10m])    ==  0)"
-    for        = "PT15M"
-    labels = {
-      "severity" = "warning"
-    }
-    severity = 4
-
-    action {
-      action_group_id = var.action_group_id
-    }
-
-    alert_resolution {
-      auto_resolved   = true
-      time_to_resolve = "PT10M"
-    }
-  }
-  rule {
-    alert = "KubeHpaReplicasMismatch"
-    annotations = {
-      "description" = "Horizontal Pod Autoscaler in {{ $labels.cluster}} has not matched the desired number of replicas for longer than 15 minutes. For more information on this alert, please refer to this [link](https://github.com/prometheus-operator/runbooks/blob/main/content/runbooks/kubernetes/KubeHpaReplicasMismatch.md)"
-    }
-    enabled    = true
-    expression = "(kube_horizontalpodautoscaler_status_desired_replicas{job=\"kube-state-metrics\"}  !=kube_horizontalpodautoscaler_status_current_replicas{job=\"kube-state-metrics\"})  and(kube_horizontalpodautoscaler_status_current_replicas{job=\"kube-state-metrics\"}  >kube_horizontalpodautoscaler_spec_min_replicas{job=\"kube-state-metrics\"})  and(kube_horizontalpodautoscaler_status_current_replicas{job=\"kube-state-metrics\"}  <kube_horizontalpodautoscaler_spec_max_replicas{job=\"kube-state-metrics\"})  and changes(kube_horizontalpodautoscaler_status_current_replicas{job=\"kube-state-metrics\"}[15m]) == 0"
-    for        = "PT15M"
-    labels = {
-      "severity" = "warning"
-    }
-    severity = 4
-
-    action {
-      action_group_id = var.action_group_id
-    }
-
-    alert_resolution {
-      auto_resolved   = true
-      time_to_resolve = "PT15M"
-    }
-  }
-  rule {
-    alert = "KubeHpaMaxedOut"
-    annotations = {
-      "description" = "Horizontal Pod Autoscaler in {{ $labels.cluster}} has been running at max replicas for longer than 15 minutes. For more information on this alert, please refer to this [link](https://github.com/prometheus-operator/runbooks/blob/main/content/runbooks/kubernetes/KubeHpaMaxedOut.md)"
-    }
-    enabled    = true
-    expression = "kube_horizontalpodautoscaler_status_current_replicas{job=\"kube-state-metrics\"}  ==kube_horizontalpodautoscaler_spec_max_replicas{job=\"kube-state-metrics\"}"
-    for        = "PT15M"
-    labels = {
-      "severity" = "warning"
-    }
-    severity = 4
-
-    action {
-      action_group_id = var.action_group_id
-    }
-
-    alert_resolution {
-      auto_resolved   = true
-      time_to_resolve = "PT15M"
-    }
-  }
-
 }
